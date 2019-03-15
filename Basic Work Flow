@@ -1,0 +1,80 @@
+#setwd
+
+setwd("/Users/mcneiljb/Desktop/VALID Hgb A1C")
+
+#install packages
+install.packages(lubridate)
+
+#import data from .xlsx files
+POCA06 <- read_excel("VALID2006POCA1C.xlsx", col_names=FALSE)
+POCA07 <- read_excel("VALID2007POCA1C.xlsx", col_names=FALSE)
+POCA08 <- read_excel("VALID2008POCA1C.xlsx", col_names=FALSE)
+POCA09 <- read_excel("VALID2009POCA1C.xlsx", col_names=FALSE)
+POCA10 <- read_excel("VALID2010POCA1C.xlsx", col_names=FALSE)
+POCA11 <- read_excel("VALID2011POCA1C.xlsx", col_names=FALSE)
+POCA12 <- read_excel("VALID2012POCA1C.xlsx", col_names=FALSE)
+POCA13 <- read_excel("VALID2013POCA1C.xlsx", col_names=FALSE)
+POCA14 <- read_excel("VALID2013POCA1C.xlsx", col_names=FALSE)
+POCA15 <- read_excel("VALID2013POCA1C.xlsx", col_names=FALSE)
+POCA16 <- read_excel("VALID2013POCA1C.xlsx", col_names=FALSE)
+
+#import and format demographic data
+
+VALIDDB <- read_xlsx("valid db.xlsx")
+VALIDDB$DemographicID=NULL
+VALIDDB$IsExportedFromMayDb=NULL
+VALIDDB$PatientSystemID=NULL
+colnames(VALIDDB)[2] <- "MRN"
+
+#combine data frames to master file
+
+VALIDPOCA1C <- rbind(POCA06, POCA07,POCA08,POCA08,POCA10,POCA11,POCA12,POCA13,POCA14,POCA15,POCA16)
+
+#Format column names and file 
+
+colnames(VALIDPOCA1C) <- c("MRN", "Date", "Time", "Test", "Value")
+
+#Convert date to string
+
+VALIDPOCA1C$Time <- sapply(strsplit(as.character(VALIDPOCA1C$Time), " "), "[", 2)
+
+#remove imported faulty date data from time stamp
+
+format(as.POSIXct(VALIDPOCA1C$Time,format='%m/%d/%Y %H:%M:%S'),format='%H:%M:%S')
+
+#export
+
+write.csv(VALIDPOCA1C, file = "VALIDPOCA1C.csv", row.names = FALSE)
+
+#Merge data frames together using left join to retain appropriate data
+
+VALIDPOCJoin <- merge(x=VALIDPOCA1C, y=VALIDDB, by= "MRN", all.x=TRUE)
+
+#Subset data of interest
+
+VALIDPOC <- subset(VALIDPOCJoin, select = c("MRN", "Date", "Time", "Test", "Value", "PatientID", "EnrollmentDate"))
+
+#Clean data and define day difference
+
+VALIDPOC$Date <- ymd(VALIDPOC$Date)
+VALIDPOC$EnrollmentDate <- ymd(VALIDPOC$EnrollmentDate)
+VALIDPOC$Day_Diff <- NA
+
+VALIDPOC$Day_Diff<- difftime(VALIDPOC$EnrollmentDate,VALIDPOC$Date,units="days")
+
+#Export
+
+write.csv(VALIDPOC, file = "VALIDPOCDayFiltered.csv", row.names = FALSE)
+
+#Separate into data frames by day
+
+#Export by day (-3 through 3_
+
+write.csv(VALIDPOCD_p3, file = "VALIDPOCD_p3.csv", row.names = FALSE)
+write.csv(VALIDPOCD_p2, file = "VALIDPOCD_p2.csv", row.names = FALSE)
+write.csv(VALIDPOCD_p1, file = "VALIDPOCD_p1.csv", row.names = FALSE)
+write.csv(VALIDPOCD_0, file = "VALIDPOCD_0.csv", row.names = FALSE)
+write.csv(VALIDPOCD_1, file = "VALIDPOCD_1.csv", row.names = FALSE)
+write.csv(VALIDPOCD_2, file = "VALIDPOCD_2.csv", row.names = FALSE)
+write.csv(VALIDPOCD_3, file = "VALIDPOCD_3.csv", row.names = FALSE)
+
