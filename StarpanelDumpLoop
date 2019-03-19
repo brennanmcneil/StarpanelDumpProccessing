@@ -1,8 +1,9 @@
 setwd("/Users/mcneiljb/Desktop/VALID/")
 
 #install packages
-install.packages(lubridate)
-install.packages(dplyr)
+install.packages("lubridate")
+install.packages("dplyr")
+install.packages("readxl")
 
 #assign path containing CSV formatted data
 
@@ -23,7 +24,9 @@ StarPanelChop <- function(file_list, folder) {
          )}
      #import and format demographic data (be sure to specify correct path)
     
-     VALIDDB <- read_xlsx("/Users/mcneiljb/Desktop/valid db.xlsx")
+    library(readxl)
+    
+     VALIDDB <- read_excel("/Users/mcneiljb/Desktop/valid db.xlsx")
      VALIDDB$DemographicID=NULL
      VALIDDB$IsExportedFromMayDb=NULL
      VALIDDB$PatientSystemID=NULL
@@ -133,13 +136,13 @@ StarPanelChop <- function(file_list, folder) {
     
     #output data
    
-    write.csv(VALIDD_0MM, "VALIDD_0.csv" row.names = FALSE)
-    write.csv(VALIDD_1MM, "VALIDD_1.csv" row.names = FALSE)
-    write.csv(VALIDD_2MM, "VALIDD_2.csv" row.names = FALSE)
-    write.csv(VALIDD_3MM, "VALIDD_3.csv" row.names = FALSE)
-    write.csv(VALIDD_p1MM, "VALIDD_p1.csv" row.names = FALSE)
-    write.csv(VALIDD_p2MM, "VALIDD_p2.csv" row.names = FALSE)
-    write.csv(VALIDD_p3MM, "VALIDD_p3.csv" row.names = FALSE)
+    write.csv(VALIDD_0MM, "VALIDD_0.csv", row.names = FALSE)
+    write.csv(VALIDD_1MM, "VALIDD_1.csv", row.names = FALSE)
+    write.csv(VALIDD_2MM, "VALIDD_2.csv", row.names = FALSE)
+    write.csv(VALIDD_3MM, "VALIDD_3.csv", row.names = FALSE)
+    write.csv(VALIDD_p1MM, "VALIDD_p1.csv", row.names = FALSE)
+    write.csv(VALIDD_p2MM, "VALIDD_p2.csv", row.names = FALSE)
+    write.csv(VALIDD_p3MM, "VALIDD_p3.csv", row.names = FALSE)
       
     
     }
