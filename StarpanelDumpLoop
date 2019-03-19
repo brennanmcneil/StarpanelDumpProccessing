@@ -1,0 +1,98 @@
+install.packages()
+
+
+StarPanelChop <- function(file_list, folder) {
+   #read in csv files
+     for (i in 1:length(file_list)){
+     
+                 assign(file_list[i], 
+               
+               read.csv(paste(folder, file_list[i], sep=''))
+               
+         )}
+     #import and format demographic data (be sure to specify correct path)
+    
+     VALIDDB <- read_xlsx("~/valid db.xlsx")
+     VALIDDB$DemographicID=NULL
+     VALIDDB$IsExportedFromMayDb=NULL
+     VALIDDB$PatientSystemID=NULL
+     colnames(VALIDDB)[2] <- "MRN"
+     
+     VALIDCombine <- rbind(file_list)
+     
+     colnames(VALIDCombine) <- c("MRN", "Date", "Time", "Test", "Value")
+    
+     #Convert date to string (or appropriate formatting for handling with lubridate later)
+     
+     VALIDCombine$Time <- sapply(strsplit(as.character(VALIDCombine$Time), " "), "[", 2)
+     
+     #remove imported faulty date data from time stamp
+     
+     format(as.POSIXct(VALIDCombine$Time,format='%m/%d/%Y %H:%M:%S'),format='%H:%M:%S')
+     
+     #export
+     
+     write.csv(VALIDCombine, file = "VALIDCombine.csv", row.names = FALSE)
+     
+     #Merge data frames together using left join to retain appropriate data
+     
+    VALIDJoin <- merge(x=VALIDCombine, y=VALIDDB, by= "MRN", all.x=TRUE)   
+    
+    #Subset data of interest
+     
+    VALID <- subset(VALIDJoin, select = c("MRN", "Date", "Time", "Test", "Value", "PatientID", "EnrollmentDate"))
+     
+     #Clean data and define day difference
+     
+     VALID$Date <- ymd(VALIDPOC$Date)
+     VALID$EnrollmentDate <- ymd(VALIDPOC$EnrollmentDate)
+     VALID$Day_Diff <- NA
+     
+     VALID$Day_Diff<- difftime(VALIDPOC$EnrollmentDate,VALIDPOC$Date,units="days")
+     
+     #Export
+     
+     write.csv(VALID, file = "VALIDDayFiltered.csv", row.names = FALSE)
+     
+     #Separate into data frames by day
+     
+     library(dpylr)
+     
+     VALIDPOCD_1 <- filter(VALIDPOC, Day_Diff == 1)
+     VALIDPOCD_2 <- filter(VALIDPOC, Day_Diff == 2)
+     VALIDPOCD_3 <- filter(VALIDPOC, Day_Diff == 3)
+     VALIDPOCD_p1 <- filter(VALIDPOC, Day_Diff == -1)
+     VALIDPOCD_p2 <- filter(VALIDPOC, Day_Diff == -2)
+     VALIDPOCD_p3 <- filter(VALIDPOC, Day_Diff == -3)
+     
+     #Export by day (-3 through 3_
+     
+    write.csv(VALIDPOCD_p3, file = "VALIDPOCD_p3.csv", row.names = FALSE)
+    write.csv(VALIDPOCD_p2, file = "VALIDPOCD_p2.csv", row.names = FALSE)
+    write.csv(VALIDPOCD_p1, file = "VALIDPOCD_p1.csv", row.names = FALSE)
+    write.csv(VALIDPOCD_0, file = "VALIDPOCD_0.csv", row.names = FALSE)
+    write.csv(VALIDPOCD_1, file = "VALIDPOCD_1.csv", row.names = FALSE)
+    write.csv(VALIDPOCD_2, file = "VALIDPOCD_2.csv", row.names = FALSE)
+    write.csv(VALIDPOCD_3, file = "VALIDPOCD_3.csv", row.names = FALSE)
+    
+    #Select for max and min
+    
+    # set lab value to numeric for sorting (5 indicates the column number to convert) 
+    
+    VALIDPOCD_0[,5] <- as.numeric(as.character( VALIDPOCD_0[, 5] ))
+    
+    #select for max and min
+    
+    VALIDPOCD_0Max <- aggregate(VALIDPOCD_0$Value, by = list(VALIDPOCD_0$MRN), max)
+    colnames(VWBCD_0Max) <- c("MRN", "Max_Value")
+   
+    VALIDPOCD_0Min <- aggregate(VALIDPOCD_0$Value, by = list(VALIDPOCD_0$MRN), min)
+    colnames(VWBCD_0Min) <- c("MRN", "Min_Value")
+    
+    VALIDPOCD_0MM <- merge(x=VALIDPOCD_0Max, y=VALIDPOCD_0Min, by= "MRN", all.x=TRUE)
+    
+    #output data
+   
+    write.csv(VALIDPOCD_1MM), "VALIDPOCD_1.csv" row.names = FALSE)
+    
+    }
