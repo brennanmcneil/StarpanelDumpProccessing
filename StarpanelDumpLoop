@@ -1,4 +1,8 @@
-install.packages()
+setwd("/Users/mcneiljb/Desktop/VALID/")
+
+#install packages
+install.packages(lubridate)
+install.packages(dplyr)
 
 
 StarPanelChop <- function(file_list, folder) {
