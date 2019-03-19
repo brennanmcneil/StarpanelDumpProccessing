@@ -4,6 +4,13 @@ setwd("/Users/mcneiljb/Desktop/VALID/")
 install.packages(lubridate)
 install.packages(dplyr)
 
+#assign path containing CSV formatted data
+
+folder <- "/Users/mcneiljb/Desktop/VALID/"   
+
+#define existing files by assiging to list string
+
+file_list <- list.files(path=folder, pattern="*.csv") 
 
 StarPanelChop <- function(file_list, folder) {
    #read in csv files
@@ -16,7 +23,7 @@ StarPanelChop <- function(file_list, folder) {
          )}
      #import and format demographic data (be sure to specify correct path)
     
-     VALIDDB <- read_xlsx("~/valid db.xlsx")
+     VALIDDB <- read_xlsx("/Users/mcneiljb/Desktop/valid db.xlsx")
      VALIDDB$DemographicID=NULL
      VALIDDB$IsExportedFromMayDb=NULL
      VALIDDB$PatientSystemID=NULL
@@ -36,7 +43,7 @@ StarPanelChop <- function(file_list, folder) {
      
      #export
      
-     write.csv(VALIDCombine, file = "VALIDCombine.csv", row.names = FALSE)
+     write.csv(VALIDCombine, file = "VALIDDataCombine.csv", row.names = FALSE)
      
      #Merge data frames together using left join to retain appropriate data
      
@@ -62,41 +69,77 @@ StarPanelChop <- function(file_list, folder) {
      
      library(dpylr)
      
-     VALIDPOCD_1 <- filter(VALIDPOC, Day_Diff == 1)
-     VALIDPOCD_2 <- filter(VALIDPOC, Day_Diff == 2)
-     VALIDPOCD_3 <- filter(VALIDPOC, Day_Diff == 3)
-     VALIDPOCD_p1 <- filter(VALIDPOC, Day_Diff == -1)
-     VALIDPOCD_p2 <- filter(VALIDPOC, Day_Diff == -2)
-     VALIDPOCD_p3 <- filter(VALIDPOC, Day_Diff == -3)
+     VALIDD_0 <- filter(VALID, Day_Diff == 0)
+     VALIDD_1 <- filter(VALID, Day_Diff == 1)
+     VALIDD_2 <- filter(VALID, Day_Diff == 2)
+     VALIDD_3 <- filter(VALID, Day_Diff == 3)
+     VALIDD_p1 <- filter(VALID, Day_Diff == -1)
+     VALIDDD_p2 <- filter(VALID, Day_Diff == -2)
+     VALIDDD_p3 <- filter(VALID, Day_Diff == -3)
      
-     #Export by day (-3 through 3_
-     
-    write.csv(VALIDPOCD_p3, file = "VALIDPOCD_p3.csv", row.names = FALSE)
-    write.csv(VALIDPOCD_p2, file = "VALIDPOCD_p2.csv", row.names = FALSE)
-    write.csv(VALIDPOCD_p1, file = "VALIDPOCD_p1.csv", row.names = FALSE)
-    write.csv(VALIDPOCD_0, file = "VALIDPOCD_0.csv", row.names = FALSE)
-    write.csv(VALIDPOCD_1, file = "VALIDPOCD_1.csv", row.names = FALSE)
-    write.csv(VALIDPOCD_2, file = "VALIDPOCD_2.csv", row.names = FALSE)
-    write.csv(VALIDPOCD_3, file = "VALIDPOCD_3.csv", row.names = FALSE)
-    
+      
     #Select for max and min
     
     # set lab value to numeric for sorting (5 indicates the column number to convert) 
     
-    VALIDPOCD_0[,5] <- as.numeric(as.character( VALIDPOCD_0[, 5] ))
+    VALIDD_0[,5] <- as.numeric(as.character( VALIDD_0[, 5] ))
+    VALIDD_1[,5] <- as.numeric(as.character( VALIDD_1[, 5] ))
+    VALIDD_2[,5] <- as.numeric(as.character( VALIDD_2[, 5] ))
+    VALIDD_3[,5] <- as.numeric(as.character( VALIDD_3[, 5] ))
+    VALIDD_p1[,5] <- as.numeric(as.character( VALIDD_p1[, 5] ))
+    VALIDD_p2[,5] <- as.numeric(as.character( VALIDD_p2[, 5] ))
+    VALIDD_p3[,5] <- as.numeric(as.character( VALIDD_p3[, 5] ))
     
     #select for max and min
     
-    VALIDPOCD_0Max <- aggregate(VALIDPOCD_0$Value, by = list(VALIDPOCD_0$MRN), max)
-    colnames(VWBCD_0Max) <- c("MRN", "Max_Value")
+    VALIDD_0Max <- aggregate(VALIDD_0$Value, by = list(VALIDD_0$MRN), max)
+    colnames(VALIDD_0Max) <- c("MRN", "Max_Value")
+    VALIDD_1Max <- aggregate(VALIDD_1$Value, by = list(VALIDD_1$MRN), max)
+    colnames(VALIDD_1Max) <- c("MRN", "Max_Value")
+    VALIDD_2Max <- aggregate(VALIDD_2$Value, by = list(VALIDD_2$MRN), max)
+    colnames(VALIDD_2Max) <- c("MRN", "Max_Value")
+    VALIDD_3Max <- aggregate(VALIDD_3$Value, by = list(VALIDD_0$MRN), max)
+    colnames(VALIDD_3Max) <- c("MRN", "Max_Value")
+    VALIDD_p1Max <- aggregate(VALIDD_p1$Value, by = list(VALIDD_p1$MRN), max)
+    colnames(VALIDD_p1Max) <- c("MRN", "Max_Value")
+    VALIDD_p2Max <- aggregate(VALIDD_p2$Value, by = list(VALIDD_p2$MRN), max)
+    colnames(VALIDD_p2Max) <- c("MRN", "Max_Value")
+    VALIDD_p3Max <- aggregate(VALIDD_p3$Value, by = list(VALIDD_p3$MRN), max)
+    colnames(VALIDD_p3Max) <- c("MRN", "Max_Value")
    
-    VALIDPOCD_0Min <- aggregate(VALIDPOCD_0$Value, by = list(VALIDPOCD_0$MRN), min)
-    colnames(VWBCD_0Min) <- c("MRN", "Min_Value")
+    VALIDD_0Min <- aggregate(VALIDD_0$Value, by = list(VALIDD_0$MRN), min)
+    colnames(VWBCD_0Max) <- c("MRN", "Max_Value")
+    VALIDD_1Min <- aggregate(VALIDD_1$Value, by = list(VALIDD_1$MRN), min)
+    colnames(VWBCD_0Max) <- c("MRN", "Max_Value")
+    VALIDD_2Min <- aggregate(VALIDD_2$Value, by = list(VALIDD_2$MRN), min)
+    colnames(VWBCD_0Max) <- c("MRN", "Max_Value")
+    VALIDD_3Min <- aggregate(VALIDD_3$Value, by = list(VALIDD_3$MRN), min)
+    colnames(VWBCD_0Max) <- c("MRN", "Max_Value")
+    VALIDD_p1Min <- aggregate(VALIDD_p1$Value, by = list(VALIDD_p1$MRN), min)
+    colnames(VALIDD_p1Min) <- c("MRN", "Max_Value")
+    VALIDD_p2Min <- aggregate(VALIDD_p2$Value, by = list(VALIDD_p2$MRN), min)
+    colnames(VALIDD_p2Min) <- c("MRN", "Max_Value")
+    VALIDD_p3Min <- aggregate(VALIDD_p3$Value, by = list(VALIDD_p3$MRN), min)
+    colnames(VALIDD_p3Min) <- c("MRN", "Max_Value")
     
-    VALIDPOCD_0MM <- merge(x=VALIDPOCD_0Max, y=VALIDPOCD_0Min, by= "MRN", all.x=TRUE)
+   VALIDD_0MM <- merge(x=VALIDD_0Max, y=VALIDD_0Min, by= "MRN", all.x=TRUE)
+   VALIDD_1MM <- merge(x=VALIDD_1Max, y=VALIDD_1Min, by= "MRN", all.x=TRUE)
+   VALIDD_2MM <- merge(x=VALIDD_2Max, y=VALIDD_2Min, by= "MRN", all.x=TRUE)
+   VALIDD_3MM <- merge(x=VALIDD_3Max, y=VALIDD_3Min, by= "MRN", all.x=TRUE)
+   VALIDD_p1MM <- merge(x=VALIDD_p1Max, y=VALIDD_p1Min, by= "MRN", all.x=TRUE)
+   VALIDD_p2MM <- merge(x=VALIDD_p2Max, y=VALIDD_p2Min, by= "MRN", all.x=TRUE)
+   VALIDD_p3MM <- merge(x=VALIDD_p3Max, y=VALIDD_p3Min, by= "MRN", all.x=TRUE)
+    
     
     #output data
    
-    write.csv(VALIDPOCD_1MM), "VALIDPOCD_1.csv" row.names = FALSE)
+    write.csv(VALIDD_0MM), "VALIDD_0.csv" row.names = FALSE)
+    write.csv(VALIDD_1MM), "VALIDD_1.csv" row.names = FALSE)
+    write.csv(VALIDD_2MM), "VALIDD_2.csv" row.names = FALSE)
+    write.csv(VALIDD_3MM), "VALIDD_3.csv" row.names = FALSE)
+    write.csv(VALIDD_p1MM), "VALIDD_p1.csv" row.names = FALSE)
+    write.csv(VALIDD_p2MM), "VALIDD_p2.csv" row.names = FALSE)
+    write.csv(VALIDD_p3MM), "VALIDD_p3.csv" row.names = FALSE)
+      
     
     }
