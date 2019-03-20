@@ -4,6 +4,8 @@ setwd("/Users/mcneiljb/Desktop/VALID/")
 install.packages("lubridate")
 install.packages("dplyr")
 install.packages("readxl")
+install.packages("plyr")
+install.packages("reshape")
 
 #assign path containing CSV formatted data
 
@@ -11,18 +13,20 @@ folder <- "/Users/mcneiljb/Desktop/VALID/"
 
 #define existing files by assiging to list string
 
-file_list <- list.files(path=folder, pattern="*.csv") 
+library(plyr)
 
-StarPanelChop <- function(file_list, folder) {
-   #read in csv files
-     for (i in 1:length(file_list)){
-     
-                 assign(file_list[i], 
-               
-               read.csv(paste(folder, file_list[i], sep=''))
-               
-         )}
+library(reshape)
+
+file_list <- list.files
+
+
      #import and format demographic data (be sure to specify correct path)
+     
+    Import.list <- llply(file_list, read.csv, header = FALSE)
+     
+    ValidData <- rbindlist(import.list)
+    
+    colnames(ValidData) <- c("MRN", "Date", "Time", "Test", "Value")
     
     library(readxl)
     
