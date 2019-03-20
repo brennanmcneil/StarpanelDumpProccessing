@@ -24,9 +24,9 @@ file_list <- list.files
      
     Import.list <- llply(file_list, read.csv, header = FALSE)
      
-    ValidData <- rbindlist(import.list)
+    ValidCombine <- rbindlist(import.list)
     
-    colnames(ValidData) <- c("MRN", "Date", "Time", "Test", "Value")
+    colnames(ValidCombine) <- c("MRN", "Date", "Time", "Test", "Value")
     
     library(readxl)
     
@@ -36,8 +36,7 @@ file_list <- list.files
      VALIDDB$PatientSystemID=NULL
      colnames(VALIDDB)[2] <- "MRN"
      
-     VALIDCombine <- rbind(file_list)
-     
+    
      colnames(VALIDCombine) <- c("MRN", "Date", "Time", "Test", "Value")
     
      #Convert date to string (or appropriate formatting for handling with lubridate later)
