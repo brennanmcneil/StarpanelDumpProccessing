@@ -9,16 +9,17 @@ install.packages("reshape")
 
 #assign path containing CSV formatted data
 
-folder <- "/Users/mcneiljb/Desktop/VALID/"   
+folder <- "/Users/mcneiljb/Desktop/VALID/"  
+
+file_list <- list.files(path=folder, pattern="*.csv") 
 
 #define existing files by assiging to list string
+
+StarPanelChop <- function(file_list, folder) {
 
 library(plyr)
 
 library(reshape)
-
-file_list <- list.files
-
 
      #import and format demographic data (be sure to specify correct path)
      
@@ -35,25 +36,11 @@ file_list <- list.files
      VALIDDB$IsExportedFromMayDb=NULL
      VALIDDB$PatientSystemID=NULL
      colnames(VALIDDB)[2] <- "MRN"
-     
-    
-     colnames(VALIDCombine) <- c("MRN", "Date", "Time", "Test", "Value")
-    
-     #Convert date to string (or appropriate formatting for handling with lubridate later)
-     
-     VALIDCombine$Time <- sapply(strsplit(as.character(VALIDCombine$Time), " "), "[", 2)
-     
-     #remove imported faulty date data from time stamp
-     
-     format(as.POSIXct(VALIDCombine$Time,format='%m/%d/%Y %H:%M:%S'),format='%H:%M:%S')
-     
-     #export
-     
-     write.csv(VALIDCombine, file = "VALIDDataCombine.csv", row.names = FALSE)
-     
+             
+        
      #Merge data frames together using left join to retain appropriate data
      
-    VALIDJoin <- merge(x=VALIDCombine, y=VALIDDB, by= "MRN", all.x=TRUE)   
+    VALIDJoin <- merge(x=ValidCombine, y=VALIDDB, by= "MRN", all.x=TRUE)   
     
     #Subset data of interest
      
