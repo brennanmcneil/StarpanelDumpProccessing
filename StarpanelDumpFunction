@@ -1,0 +1,135 @@
+
+
+StarPanelChop <- function(file_list, folder) {
+  
+  library(plyr)
+  library(readxl)
+  library(here)
+  library(data.table)
+  
+  #import and format demographic data (be sure to specify correct path)
+  
+  import.list <- llply(Data_List, read_xlsx, col_names = FALSE)
+ 
+  ValidCombine <- rbindlist(import.list)
+  
+  colnames(ValidCombine) <- c("MRN", "Test_Date", "Time", "Test", "Value")
+  
+  ValidCombine$MRN <- as.numeric(as.character(ValidCombine$MRN))
+  
+  VALIDDB <- read_excel(here("valid db.xlsx"))
+  
+  VALIDDB$DemographicID=NULL
+  VALIDDB$IsExportedFromMayDb=NULL
+  VALIDDB$PatientSystemID=NULL
+  colnames(VALIDDB)[2] <- "MRN"
+  
+  VALIDDB$MRN <- as.numeric(as.character(VALIDDB$MRN))
+  
+  #Merge data frames together using left join to retain appropriate data
+  
+  VALIDMerge <- merge(x=ValidCombine, y=VALIDDB, by= "MRN", all.x=TRUE)   
+  
+  #Subset data of interest
+  
+  LabeledJoin <- subset(VALIDMerge, select = c("MRN", "Test_Date", "Time", "Test", "Value", "PatientID", "EnrollmentDate"))
+  
+  #remove missing data
+  
+  library(tidyr)
+  
+  VALID_Join <- LabeledJoin %>% drop_na(Value)
+  
+  #Clean data and define day difference
+  
+  library(lubridate)
+  
+  VALID_Join$Test_Date <- ymd(VALID_Join$Test_Date)
+  VALID_Join$EnrollmentDate <- ymd(VALID_Join$EnrollmentDate)
+  VALID_Join$Day_Diff <- NA
+  
+  VALID_Join$Day_Diff<- difftime(VALID_Join$EnrollmentDate,VALID_Join$Test_Date, units="days")
+  
+  #Export
+  
+  write.csv(VALID_Join, file = "VALIDDayFiltered.csv", row.names = FALSE)
+  
+  #Separate into data frames by day
+  
+  library(dplyr)
+  
+  VALIDD_0 <- filter(VALID_Join, Day_Diff == 0)
+  VALIDD_1 <- filter(VALID_Join, Day_Diff == 1)
+  VALIDD_2 <- filter(VALID_Join, Day_Diff == 2)
+  VALIDD_3 <- filter(VALID_Join, Day_Diff == 3)
+  VALIDD_p1 <- filter(VALID_Join, Day_Diff == -1)
+  VALIDD_p2 <- filter(VALID_Join, Day_Diff == -2)
+  VALIDD_p3 <- filter(VALID_Join, Day_Diff == -3)
+  
+  
+  #Select for max and min
+  
+  # set lab value to numeric for sorting (5 indicates the column number to convert) 
+  
+  VALIDD_0$Value <- as.numeric(as.character( VALIDD_0$Value))
+  VALIDD_1$Value <- as.numeric(as.character( VALIDD_1$Value))
+  VALIDD_2$Value <- as.numeric(as.character( VALIDD_2$Value))
+  VALIDD_3$Value <- as.numeric(as.character( VALIDD_3$Value))
+  VALIDD_p1$Value <- as.numeric(as.character( VALIDD_p1$Value))
+  VALIDD_p2$Value <- as.numeric(as.character( VALIDD_p2$Value))
+  VALIDD_p3$Value <- as.numeric(as.character( VALIDD_p3$Value))
+  
+  
+  #select for max and min
+  
+  VALIDD_0Max <- aggregate(VALIDD_0$Value, by = list(VALIDD_0$PatientID), max)
+  colnames(VALIDD_0Max) <- c("PatientID", "Max_Value")
+  VALIDD_1Max <- aggregate(VALIDD_1$Value, by = list(VALIDD_1$PatientID), max)
+  colnames(VALIDD_1Max) <- c("PatientID", "Max_Value")
+  VALIDD_2Max <- aggregate(VALIDD_2$Value, by = list(VALIDD_2$PatientID), max)
+  colnames(VALIDD_2Max) <- c("PatientID", "Max_Value")
+  VALIDD_3Max <- aggregate(VALIDD_3$Value, by = list(VALIDD_3$PatientID), max)
+  colnames(VALIDD_3Max) <- c("PatientID", "Max_Value")
+  VALIDD_p1Max <- aggregate(VALIDD_p1$Value, by = list(VALIDD_p1$PatientID), max)
+  colnames(VALIDD_p1Max) <- c("PatientID", "Max_Value")
+  VALIDD_p2Max <- aggregate(VALIDD_p2$Value, by = list(VALIDD_p2$PatientID), max)
+  colnames(VALIDD_p2Max) <- c("PatientID", "Max_Value")
+  VALIDD_p3Max <- aggregate(VALIDD_p3$Value, by = list(VALIDD_p3$PatientID), max)
+  colnames(VALIDD_p3Max) <- c("PatientID", "Max_Value")
+  
+  VALIDD_0Min <- aggregate(VALIDD_0$Value, by = list(VALIDD_0$PatientID), min)
+  colnames(VALIDD_0Min) <- c("PatientID", "Min_Value")
+  VALIDD_1Min <- aggregate(VALIDD_1$Value, by = list(VALIDD_1$PatientID), min)
+  colnames(VALIDD_1Min) <- c("PatientID", "Min_Value")
+  VALIDD_2Min <- aggregate(VALIDD_2$Value, by = list(VALIDD_2$PatientID), min)
+  colnames(VALIDD_2Min) <- c("PatientID", "Min_Value")
+  VALIDD_3Min <- aggregate(VALIDD_3$Value, by = list(VALIDD_3$PatientID), min)
+  colnames(VALIDD_3Min) <- c("PatientID", "Min_Value")
+  VALIDD_p1Min <- aggregate(VALIDD_p1$Value, by = list(VALIDD_p1$PatientID), min)
+  colnames(VALIDD_p1Min) <- c("PatientID", "Min_Value")
+  VALIDD_p2Min <- aggregate(VALIDD_p2$Value, by = list(VALIDD_p2$PatientID), min)
+  colnames(VALIDD_p2Min) <- c("PatientID", "Min_Value")
+  VALIDD_p3Min <- aggregate(VALIDD_p3$Value, by = list(VALIDD_p3$PatientID), min)
+  colnames(VALIDD_p3Min) <- c("PatientID", "Min_Value")
+  
+  VALIDD_0MM <- merge(x=VALIDD_0Max, y=VALIDD_0Min, by= "PatientID", all.x=TRUE)
+  VALIDD_1MM <- merge(x=VALIDD_1Max, y=VALIDD_1Min, by= "PatientID", all.x=TRUE)
+  VALIDD_2MM <- merge(x=VALIDD_2Max, y=VALIDD_2Min, by= "PatientID", all.x=TRUE)
+  VALIDD_3MM <- merge(x=VALIDD_3Max, y=VALIDD_3Min, by= "PatientID", all.x=TRUE)
+  VALIDD_p1MM <- merge(x=VALIDD_p1Max, y=VALIDD_p1Min, by= "PatientID", all.x=TRUE)
+  VALIDD_p2MM <- merge(x=VALIDD_p2Max, y=VALIDD_p2Min, by= "PatientID", all.x=TRUE)
+  VALIDD_p3MM <- merge(x=VALIDD_p3Max, y=VALIDD_p3Min, by= "PatientID", all.x=TRUE)
+  
+  
+  #output data
+  
+  write.csv(VALIDD_0MM, "VALIDD_0.csv", row.names = FALSE)
+  write.csv(VALIDD_1MM, "VALIDD_1.csv", row.names = FALSE)
+  write.csv(VALIDD_2MM, "VALIDD_2.csv", row.names = FALSE)
+  write.csv(VALIDD_3MM, "VALIDD_3.csv", row.names = FALSE)
+  write.csv(VALIDD_p1MM, "VALIDD_p1.csv", row.names = FALSE)
+  write.csv(VALIDD_p2MM, "VALIDD_p2.csv", row.names = FALSE)
+  write.csv(VALIDD_p3MM, "VALIDD_p3.csv", row.names = FALSE)
+  
+  
+}
